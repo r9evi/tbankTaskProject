@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: user
+      changes:
+        - createTable:
+            tableName: translations
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_translations
+              - column:
+                  name: ip
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: original_text
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: translated_text
+                  type: TEXT
+                  constraints:
+                    nullable: false
