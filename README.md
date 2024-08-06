@@ -21,8 +21,7 @@ cd tbankTaskProject/translate
 ```
 
 # Запуск приложения
-**Рекомендуется использование через Docker Compose**
-## 1. Использование Docker Compose.
+## Использование Docker Compose.
 
 Приложение настроено для работы с Docker Compose, что позволяет легко запустить его вместе с необходимыми зависимостями (PostgreSQL).
 
