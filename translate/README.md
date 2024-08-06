@@ -16,8 +16,8 @@ Translation Application - это приложение для перевода т
 2. Склонируйте репозиторий:
 
 ```bash
-git clone <https://github.com/r9evi/tbankTaskProject.git>
-cd <tbankTaskProject>
+git clone https://github.com/r9evi/tbankTaskProject.git
+cd tbankTaskProject/translate
 ```
 
 # Запуск приложения
