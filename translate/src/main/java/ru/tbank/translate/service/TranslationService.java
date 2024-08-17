@@ -3,6 +3,8 @@ package ru.tbank.translate.service;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,15 +31,18 @@ import java.util.stream.Collectors;
 @Service
 public class TranslationService {
 
+    @Autowired
+    private Environment env;
+
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String iamToken = System.getenv("IAM_TOKEN");
-    private final String folderId = System.getenv("FOLDER_ID");
-    private final String apiUrl = "https://translate.api.cloud.yandex.net/translate/v2/translate";
 
     private final TranslationRepository translationRepository;
+    private final TranslationMapper translationMapper;
 
+    @Autowired
     public TranslationService(TranslationRepository translationRepository) {
         this.translationRepository = translationRepository;
+        this.translationMapper = TranslationMapper.INSTANCE;
     }
 
     /**
@@ -45,9 +50,10 @@ public class TranslationService {
      *
      * @return List of all translations.
      */
+    @Autowired
     public List<TranslationDTO> getAllTranslations() {
         return translationRepository.getAll().stream()
-                .map(TranslationMapper::toDTO)
+                .map(translationMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -57,7 +63,7 @@ public class TranslationService {
      * @param dto TranslationDTO to be saved.
      */
     public void saveTranslation(TranslationDTO dto) {
-        Translation translation = TranslationMapper.toEntity(dto);
+        Translation translation = translationMapper.toEntity(dto);
         translationRepository.save(translation);
     }
 
@@ -68,7 +74,7 @@ public class TranslationService {
      * @param dto Updated TranslationDTO.
      */
     public void updateTranslation(int id, TranslationDTO dto) {
-        Translation translation = TranslationMapper.toEntity(dto);
+        Translation translation = translationMapper.toEntity(dto);
         translation.setId(id);
         translationRepository.update(translation);
     }
@@ -83,7 +89,7 @@ public class TranslationService {
     }
 
     public TranslationDTO getTranslation(int id) {
-        return TranslationMapper.toDTO(translationRepository.findById(id));
+        return translationMapper.toDTO(translationRepository.findById(id));
     }
 
     /**
@@ -97,9 +103,9 @@ public class TranslationService {
      */
     public String translateText(String text, String sourceLang, String targetLang, String ipAddress) {
         String[] words = text.split("\\s+");
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+
         List<Future<String>> futures = new ArrayList<>();
-        try {
+        try (ExecutorService executor = Executors.newFixedThreadPool(10);) {
             for (String word : words) {
                 futures.add(executor.submit(() -> translateWord(word, sourceLang, targetLang)));
             }
@@ -113,8 +119,6 @@ public class TranslationService {
                 }
             }
             return translatedText.toString().trim();
-        } finally {
-            executor.shutdown();
         }
     }
 
@@ -128,6 +132,10 @@ public class TranslationService {
      * @throws JSONException If there is an error parsing the JSON response.
      */
     private String translateWord(String word, String sourceLang, String targetLang) throws JSONException {
+        String iamToken = env.getProperty("IAM_TOKEN");
+        String folderId = env.getProperty("FOLDER_ID");
+        String apiUrl = env.getProperty("API_URL");
+
         JSONObject body = new JSONObject();
         body.put("sourceLanguageCode", sourceLang);
         body.put("targetLanguageCode", targetLang);
@@ -140,6 +148,7 @@ public class TranslationService {
 
         HttpEntity<String> entity = new HttpEntity<>(body.toString(), headers);
 
+        assert apiUrl != null;
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
         JSONObject jsonResponse = new JSONObject(response.getBody());
