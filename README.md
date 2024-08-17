@@ -16,8 +16,19 @@ Translation Application - это приложение для перевода т
 git clone https://github.com/r9evi/tbankTaskProject.git
 cd tbankTaskProject/translate
 ```
+# Конфигурация
+**Переменные среды**
+
+Для работы приложения нужно настроить ключи в файле .env. А именно:
+
+- IAM_TOKEN: Токен для доступа к Yandex Translate API
+- FOLDER_ID: ID папки для Yandex Translate API
+- API-URL: URL Yandex Translate
 
 # Запуск приложения
+
+Данный этап выполняется только после настройки .env
+
 **Использование Docker Compose**
 
 Приложение настроено для работы с Docker Compose, что позволяет легко запустить его вместе с необходимыми зависимостями (PostgreSQL).
@@ -31,17 +42,6 @@ docker-compose up --build
 ```
 Это создаст и запустит контейнеры для приложения и базы данных.
 
-# Конфигурация
-**Переменные среды**
-
-Для настройки приложения используются следующие переменные среды:
-
-- SPRING_DATASOURCE_URL: URL базы данных
-- SPRING_DATASOURCE_USERNAME: Имя пользователя базы данных
-- SPRING_DATASOURCE_PASSWORD: Пароль базы данных
-- SPRING_LIQUIBASE_CHANGELOG: Путь к файлу changelog Liquibase
-- IAM_TOKEN: Токен для доступа к Yandex Translate API
-- FOLDER_ID: ID папки для Yandex Translate API
 
 Пример использования переменных среды в Docker Compose:
 ```yaml
