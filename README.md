@@ -19,7 +19,7 @@ cd tbankTaskProject/translate
 # Конфигурация
 **Переменные среды**
 
-Для работы приложения нужно настроить ключи в файле .env. А именно:
+Для работы приложения требуется настроить ключи в файле .env. А именно:
 
 - IAM_TOKEN: Токен для доступа к Yandex Translate API
 - FOLDER_ID: ID папки для Yandex Translate API
